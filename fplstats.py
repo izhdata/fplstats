@@ -52,6 +52,7 @@ for x in range(17):
         #print(player)
         with open('fplstats.csv', 'a', newline='') as csvfile:
             writer = csv.writer(csvfile)
+            # Include previous season stats if available, otherwise just output player details
             if len(player_stats.text) > 0:  
                 for row in player_stats.find_elements_by_css_selector('tr'):
                     player_data = [d.text for d in row.find_elements_by_css_selector('td')]
