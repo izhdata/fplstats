@@ -17,7 +17,7 @@ header_row = ["Name", "Position", "Club", "Price",
               "Saves", "Bonus", "Bonus Points System", "Influence",
               "Creativity", "Threat", "ICT Index",
               "Price at start of season", "Price at end of season"]
-with open('ffstats.csv', 'a', newline='') as csvfile:
+with open('fplstats.csv', 'a', newline='') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(header_row)
 
@@ -50,7 +50,7 @@ for x in range(17):
             player_stats = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[3]/div/div/div[3]/div/table/tbody")
         player = [player_name.text, player_position.text, player_club.text, player_price.text]
         #print(player)
-        with open('ffstats.csv', 'a', newline='') as csvfile:
+        with open('fplstats.csv', 'a', newline='') as csvfile:
             writer = csv.writer(csvfile)
             if len(player_stats.text) > 0:  
                 for row in player_stats.find_elements_by_css_selector('tr'):
