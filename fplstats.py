@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException
 import csv
 import time
 
@@ -17,12 +18,12 @@ header_row = ["Name", "Position", "Club", "Price",
               "Saves", "Bonus", "Bonus Points System", "Influence",
               "Creativity", "Threat", "ICT Index",
               "Price at start of season", "Price at end of season"]
-with open('fplstats.csv', 'a', newline='') as csvfile:
+with open('fplstats.csv', 'a', newline='', encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(header_row)
 
-# Do this for all 17 pages    
-for x in range(17):
+# Do this for all 18 pages    
+for x in range(18):
     
     page_num_text = driver.find_element_by_xpath("/html/body/main/div/div[2]/div/div/div/div")
     print("Processing page: ", page_num_text.text)
@@ -41,25 +42,34 @@ for x in range(17):
             player_position = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[1]/div/div/div[1]/span")
             player_club = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[1]/div/div/div[1]/div")
             player_price = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[1]/ul[1]/li[4]/div")
-            player_stats = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[2]/div/div/div[3]/div/table/tbody")
+            try:
+                player_stats = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[2]/div/div/div[3]/div/table/tbody")
+            except NoSuchElementException:
+                player_stats = []
         else:
             player_name = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[2]/div/div/div[1]/h2")
             player_position = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[2]/div/div/div[1]/span")
             player_club = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[2]/div/div/div[1]/div")
             player_price = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[2]/ul[1]/li[4]/div")
-            player_stats = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[3]/div/div/div[3]/div/table/tbody")
+            try:
+                player_stats = driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[2]/div[3]/div/div/div[3]/div/table/tbody")
+            except NoSuchElementException:
+                player_stats = []
         player = [player_name.text, player_position.text, player_club.text, player_price.text]
         #print(player)
-        with open('fplstats.csv', 'a', newline='') as csvfile:
+        with open('fplstats.csv', 'a', newline='', encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
             # Include previous season stats if available, otherwise just output player details
-            if len(player_stats.text) > 0:  
-                for row in player_stats.find_elements_by_css_selector('tr'):
-                    player_data = [d.text for d in row.find_elements_by_css_selector('td')]
-                    player_output = player + player_data
-                    writer.writerow(player_output)
-            else:
+            if not player_stats:
                 writer.writerow(player)
+            else:
+                if len(player_stats.text) > 0:  
+                    for row in player_stats.find_elements_by_css_selector('tr'):
+                        player_data = [d.text for d in row.find_elements_by_css_selector('td')]
+                        player_output = player + player_data
+                        writer.writerow(player_output)
+                else:
+                    writer.writerow(player)
                 
         driver.find_element_by_xpath("/html/body/div/div/dialog/div/div[1]/div/button").click() # Close the info page
 
