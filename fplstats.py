@@ -22,10 +22,15 @@ with open('fplstats.csv', 'a', newline='', encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(header_row)
 
-# Do this for all 18 pages    
-for x in range(18):
+#Grab final page number (Page 1 of 18)
+page_num_text = driver.find_element_by_xpath("/html/body/main/div/div[2]/div/div/div[3]/div")
+final_page_num = page_num_text.text.split()[-1]
+
+# Do this for all pages    
+for x in range(int(final_page_num)):
     
-    page_num_text = driver.find_element_by_xpath("/html/body/main/div/div[2]/div/div/div/div")
+    #page_num_text = driver.find_element_by_xpath("/html/body/main/div/div[2]/div/div/div/div")
+    
     print("Processing page: ", page_num_text.text)
 
     players_table = driver.find_element_by_xpath("/html/body/main/div/div[2]/div/div/table/tbody")
@@ -33,7 +38,7 @@ for x in range(18):
     num_players = len(players)
     #Do this for each player on page
     for i in range(num_players):
-        xpath_str = "/html/body/main/div/div[2]/div/div/table/tbody/tr[" + str(i+1) + "]/td[1]/div/button"
+        xpath_str = "/html/body/main/div/div[2]/div/div/table/tbody/tr[" + str(i+1) + "]/td[1]/button"
         driver.find_element_by_xpath(xpath_str).click() # Click info button for current player
         # Some player info pages contain div sections for injuries and suspensions, this if/else bit handles the extra div tags
         extra_divs=driver.find_elements_by_xpath("/html/body/div/div/dialog/div/div[2]/div[2]/div/div/div[1]/h2")
